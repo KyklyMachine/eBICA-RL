@@ -31,6 +31,6 @@ class IDancer:
     def get_action(self):
         raise NotImplementedError()
 
-    def update_q(self, state: dict[str: tuple]):
+    def update_q(self, state: dict[str: tuple], prev_state: dict[str: tuple]):
         raise NotImplementedError()
 

@@ -27,10 +27,11 @@ class Dancer(IDancer):
 
         for act in self._actions.keys():
             if self._actions[act]:
-                states_val = list(dancers.keys())
+                states_val = [dancer.id for dancer in self._dancers]
                 self._Q[act] = QMatrix(self._states[act], states_val)
             else:
-                states_val = list(dancers.keys())
+
+                states_val = [dancer.id for dancer in self._dancers]
                 states_val.pop(self._id)
                 #states_val = list(map(str, states_val))
                 #print(states_val)
@@ -53,9 +54,10 @@ class Dancer(IDancer):
     def action(self):
         return self._action
 
-    def update_q(self, state: dict[str: tuple]):
-        reward = self._reward_model.reward(state=state, action=self.action)
+    def update_q(self, state: dict[str: tuple], prev_state: dict[str: tuple]):
+        reward = self._reward_model.reward(state=state, action=self.action, dancer_id=self._id)
         self._Q = self._learning_model.fit(state=state, action=self.action, q_matrix=self._Q, reward=reward)
+        return reward
 
 
 class People(IDancer):
@@ -68,7 +70,7 @@ class People(IDancer):
                  reward_model: IReward=None,
                  dancers: dict=None
                  ):
-
+        self._id = dancer_id
         self._actions = actions
         self._states = states
         self._dancers = dancers
@@ -79,19 +81,23 @@ class People(IDancer):
 
     def set_action(self, state: list[str]):
         res_act = {}
-
         for i, val in enumerate(self._actions.keys()):
             act_string = "Введите номер действия:\n"
-            for j, dancer in enumerate(self._dancers.keys()):
-                act_string += f"{j} – {val} with {dancer}\n"
+            dancers_ids = [dancer.id for dancer in self._dancers]
+
+            # Важно: нужно посмотреть, можно ли нам самим с собой производить интеракцию
+            if not self._actions[val]:
+                dancers_ids.pop(self._id)
+
+            for dancer_id in dancers_ids:
+                act_string += f"{dancer_id} – {val} with {dancer_id}\n"
             act_string += "Ввод: "
             act_number = int(input(act_string))
-            #act_string = acts[act_number]
-            if act_number not in np.arange(len(self._dancers.keys())):
-                print("Неверный номер действия! Повторите ввод.")
-                return self.commit_act(state)
-            res_act[val] = act_number
 
+            if act_number not in dancers_ids:
+                print("Неверный номер действия! Повторите ввод.")
+                return self.set_action(state)
+            res_act[val] = act_number
         self._action = res_act
 
     @property
