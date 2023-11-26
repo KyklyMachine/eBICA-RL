@@ -4,8 +4,10 @@ from src.RewardClasses.IReward import IReward
 class Reward(IReward):
 
     def __init__(self):
-        super().__init__()
-
-    @staticmethod
-    def reward(self, state, action):
         pass
+
+    def reward(self, state, action):
+        if action["Dance"] == 2 and action["Invite"] == 1:
+            return 1
+        else:
+            return -1

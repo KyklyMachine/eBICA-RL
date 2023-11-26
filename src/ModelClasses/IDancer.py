@@ -6,14 +6,18 @@ from src.LearningModelClasses.ILearningModel import ILearningModel
 class IDancer:
 
     _reward_model: IReward
-    _Q: list[QMatrix]
+    _Q: dict[str: QMatrix] = {}
 
     _learning_model: ILearningModel
 
-    _actions: list[list[str]]
-    _action: list[str]
+    _actions: dict[str: bool]
+    _action: dict[any]
 
-    _states: list[list[str]]
+    _states: dict[str: list[str]]
+
+    _id: any
+
+    _dancers: dict
 
     def __init__(self):
         raise NotImplementedError()
@@ -27,6 +31,6 @@ class IDancer:
     def get_action(self):
         raise NotImplementedError()
 
-    def update_q(self):
+    def update_q(self, state: dict[str: tuple]):
         raise NotImplementedError()
 
