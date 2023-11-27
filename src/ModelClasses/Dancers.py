@@ -33,19 +33,15 @@ class Dancer(IDancer):
 
                 states_val = [dancer.id for dancer in self._dancers]
                 states_val.pop(self._id)
-                #states_val = list(map(str, states_val))
-                #print(states_val)
                 self._Q[act] = QMatrix(states=self._states[act], actions=states_val)
 
     def __str__(self):
         return f"{self._id}: Dancer(IDancer)"
 
     def set_action(self, state: dict[str: tuple]):
-        #print(self._Q["Dance"].loc[[state["Dance"]]])
         action = {}
         for act in state.keys():
             state_val = self._Q[act].loc[[state[act]]].to_numpy().reshape((-1))
-            #print(state_val)
             action_index = np.where(state_val.max() == state_val)[0][0]
             action[act] = self._Q[act].actions[action_index]
         self._action = action
@@ -85,7 +81,7 @@ class People(IDancer):
             act_string = "Введите номер действия:\n"
             dancers_ids = [dancer.id for dancer in self._dancers]
 
-            # Важно: нужно посмотреть, можно ли нам самим с собой производить интеракцию
+            # Важно: нужно посмотреть, можно ли нам самим с собой производить взаимодействие
             if not self._actions[val]:
                 dancers_ids.pop(self._id)
 

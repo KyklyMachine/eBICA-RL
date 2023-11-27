@@ -1,21 +1,24 @@
-from dataclasses import dataclass
-
-import numpy as np
-import matplotlib.pyplot as plt
-
-import src.ModelClasses.Dancers as d
 import src.LearningModelClasses.LearningModel as lm
 from src.RewardClasses import RewardN as rm
-import copy
+import src.ModelClasses.Dancers as d
+from dataclasses import dataclass
+import numpy as np
 import itertools
+import copy
+import matplotlib.pyplot as plt
+
+
+SAME_DANCERS_IDS = "The ID of the dancers must be unique!"
 
 
 @dataclass
 class DancerInit:
     id: int
     dancer: type(d.IDancer)
-    learning_model: type(lm.ILearningModel)
     reward_model: type(rm.IReward)
+    learning_model: type(lm.ILearningModel)
+    learning_model_params: dict
+
 
 
 class System:
@@ -26,6 +29,12 @@ class System:
     _dancers: dict[int: d.IDancer] = {}
 
     def __init__(self, actions: dict[str: bool], dancers: list[DancerInit]):
+
+        # Checking input parameters
+        dancers_ids = [dancer.id for dancer in dancers]
+        if len(set(dancers_ids)) != len(dancers_ids):
+            raise ValueError(SAME_DANCERS_IDS)
+
 
         self._actions = actions
 
@@ -52,7 +61,7 @@ class System:
         for i in range(len(dancers)):
             d = dancers[i].dancer(
                                     dancer_id=i,
-                                    learning_model=dancers[i].learning_model(),
+                                    learning_model=dancers[i].learning_model(**dancers[i].learning_model_params),
                                     reward_model=dancers[i].reward_model(),
                                     actions=self._actions,
                                     states=self._states,
@@ -120,20 +129,23 @@ if __name__ == "__main__":
         DancerInit(
             id=0,
             dancer=d.Dancer,
-            learning_model=lm.LearningModel,
-            reward_model=rm.Reward
-                   ),
+            reward_model=rm.Reward,
+            learning_model = lm.LearningModel,
+            learning_model_params={"alpha": 0.2}
+        ),
         DancerInit(
             id=1,
             dancer=d.Dancer,
+            reward_model=rm.Reward,
             learning_model=lm.LearningModel,
-            reward_model=rm.Reward
-        ),
+            learning_model_params={"gamma": 0.4}
+         ),
         DancerInit(
             id=2,
             dancer=d.Dancer,
+            reward_model=rm.Reward,
             learning_model=lm.LearningModel,
-            reward_model=rm.Reward
+            learning_model_params={"alpha": 0.2, "gamma": 0.5}
         ),
     ]
 
@@ -145,7 +157,7 @@ if __name__ == "__main__":
         print(f"======================Iteration {i}======================")
         #print("START STATE:", s.state)
         r.append(s.iteration())
-
+        print(f"Reward: {r[-1]}")
         #print("END STATE:", s.state)
     """
     plt.plot(r)

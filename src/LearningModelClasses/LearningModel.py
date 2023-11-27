@@ -7,20 +7,19 @@ class LearningModel(ILearningModel):
 
     _s_prev: dict[str: tuple] = None
 
-    def __init__(self, alpha=0.1, gamma=0.5):
+    def __init__(self, alpha=0.2, gamma=0.5):
         self._alpha = alpha
         self._gamma = gamma
 
+
+
     def fit(self, state: dict[str: tuple], action: dict[str: int], q_matrix, reward: float = 0):
-        #print(self._s_prev)
 
         new_q = copy.deepcopy(q_matrix)
 
         if self._s_prev:
             q = {}
             for val in state.keys():
-                #print(self._s_prev["Dance"])
-                #print(reward)
                 s_new = state[val]
                 a_new = action[val]
                 q_matrix_val = q_matrix[val]
