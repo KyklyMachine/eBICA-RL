@@ -25,15 +25,19 @@ class Dancer(IDancer):
         self._id = dancer_id
         self._dancers = dancers
 
+        # Q matrix formation
         for act in self._actions.keys():
             if self._actions[act]:
                 states_val = [dancer.id for dancer in self._dancers]
+                states_val.insert(0, -1)
                 self._Q[act] = QMatrix(self._states[act], states_val)
             else:
 
                 states_val = [dancer.id for dancer in self._dancers]
                 states_val.pop(self._id)
+                states_val.insert(0, -1)
                 self._Q[act] = QMatrix(states=self._states[act], actions=states_val)
+
 
     def __str__(self):
         return f"{self._id}: Dancer(IDancer)"
@@ -100,8 +104,50 @@ class People(IDancer):
     def action(self):
         return self._action
 
-    def update_q(self, state: dict[str: tuple]):
-        pass
+    def update_q(self, state: dict[str: tuple], prev_state: dict[str: tuple]):
+        return 0
+
+
+class DancerData(IDancer):
+    _dataframe: pd.DataFrame
+    _iteration: int
+
+    def __init__(self,
+                 dancer_id: int,
+                 actions: dict[str],
+                 states: dict[str: list[tuple]],
+                 path: str,
+                 learning_model: ILearningModel=None,
+                 reward_model: IReward=None,
+                 dancers: dict=None,
+                 ):
+        self._id = dancer_id
+        self._actions = actions
+        self._states = states
+        self._dancers = dancers
+
+        self._dataframe = pd.read_csv(path, names=["Invite_0", "Invite_1", "Invite_2", "Dance_0", "Dance_1", "Dance_2"])
+        self._dataframe = self._dataframe[[f"Invite_{dancer_id}", f"Dance_{dancer_id}"]]
+        self._dataframe.columns = ["Invite", "Dance"]
+        self._iteration = 0
+
+    def __str__(self):
+        return "DataDancer(IDancer)"
+
+    def set_action(self, state: list[str]):
+        res_act = {
+            "Invite": self._dataframe["Invite"][self._iteration] - 1,
+            "Dance": self._dataframe["Dance"][self._iteration] - 1
+        }
+        self._iteration += 1
+        self._action = res_act
+
+    @property
+    def action(self):
+        return self._action
+
+    def update_q(self, state: dict[str: tuple], prev_state: dict[str: tuple]):
+        return 0
 
 
 if __name__ == "__main__":

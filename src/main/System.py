@@ -15,7 +15,9 @@ SAME_DANCERS_IDS = "The ID of the dancers must be unique!"
 class DancerInit:
     id: int
     dancer: type(d.IDancer)
+    dancer_params: dict
     reward_model: type(rm.IReward)
+    reward_model_params: dict
     learning_model: type(lm.ILearningModel)
     learning_model_params: dict
 
@@ -62,10 +64,11 @@ class System:
             d = dancers[i].dancer(
                                     dancer_id=i,
                                     learning_model=dancers[i].learning_model(**dancers[i].learning_model_params),
-                                    reward_model=dancers[i].reward_model(),
+                                    reward_model=dancers[i].reward_model(**dancers[i].reward_model_params),
                                     actions=self._actions,
                                     states=self._states,
                                     dancers=dancers,
+                                    **dancers[i].dancer_params
                                     )
             q = copy.deepcopy(d._Q)
             d._Q = q
@@ -128,22 +131,28 @@ if __name__ == "__main__":
     dancers = [
         DancerInit(
             id=0,
-            dancer=d.Dancer,
+            dancer=d.DancerData,
+            dancer_params={"path": "../../dancer_data/data1/002.csv"},
             reward_model=rm.Reward,
-            learning_model = lm.LearningModel,
+            reward_model_params={},
+            learning_model=lm.LearningModel,
             learning_model_params={"alpha": 0.2}
         ),
         DancerInit(
             id=1,
             dancer=d.Dancer,
+            dancer_params={},
             reward_model=rm.Reward,
+            reward_model_params={},
             learning_model=lm.LearningModel,
             learning_model_params={"gamma": 0.4}
          ),
         DancerInit(
             id=2,
             dancer=d.Dancer,
+            dancer_params={},
             reward_model=rm.Reward,
+            reward_model_params={},
             learning_model=lm.LearningModel,
             learning_model_params={"alpha": 0.2, "gamma": 0.5}
         ),
@@ -153,16 +162,21 @@ if __name__ == "__main__":
 
     s = System(actions_dict, dancers)
     r = []
-    for i in range(500):
+    for i in range(7200):
         print(f"======================Iteration {i}======================")
-        #print("START STATE:", s.state)
+        print("START STATE:", s.state)
         r.append(s.iteration())
         print(f"Reward: {r[-1]}")
-        #print("END STATE:", s.state)
-    """
+        print("END STATE:", s.state)
+
+    start = 2000
+    less_0 = [r_i for r_i in r[start::] if r_i < 0]
+    greater_0 = [r_i for r_i in r[start::] if r_i >= 0]
+    print(len(less_0), len(greater_0))
+
     plt.plot(r)
     plt.show()
-    """
+
 
 
 
