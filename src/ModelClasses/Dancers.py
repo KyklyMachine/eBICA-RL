@@ -125,6 +125,7 @@ class DancerData(IDancer):
         self._actions = actions
         self._states = states
         self._dancers = dancers
+        self._reward_model = reward_model
 
         self._dataframe = pd.read_csv(path, names=["Invite_0", "Invite_1", "Invite_2", "Dance_0", "Dance_1", "Dance_2"])
         self._dataframe = self._dataframe[[f"Invite_{dancer_id}", f"Dance_{dancer_id}"]]
@@ -147,7 +148,8 @@ class DancerData(IDancer):
         return self._action
 
     def update_q(self, state: dict[str: tuple], prev_state: dict[str: tuple]):
-        return 0
+        reward = self._reward_model.reward(state=state, action=self.action, dancer_id=self._id)
+        return reward
 
 
 if __name__ == "__main__":

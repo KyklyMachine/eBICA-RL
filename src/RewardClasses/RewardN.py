@@ -48,7 +48,7 @@ class Reward(IReward):
 
     _history: StateHistory
 
-    def __init__(self, noise=True, noise_type="first_iterations", noise_count=2):
+    def __init__(self, noise=True, noise_type="first_iterations", noise_count=0):
         self._is_noise = noise
         self._noise_type = noise_type
         self._noise_count = noise_count
@@ -74,7 +74,7 @@ class Reward(IReward):
                         prev = self._history[i]["Invite"][dancer_id]
                 if impose:
                     total_reward -= 5
-                    print(f"Танцор {dancer_id} навязывается!")
+                    #print(f"Танцор {dancer_id} навязывается!")
 
         else:
             total_reward -= 1
@@ -94,10 +94,10 @@ class Reward(IReward):
             if dancer_id in self._history[-1]["Invite"]:
                 if action["Dance"] == self._history[-1]["Invite"].index(dancer_id):
                     total_reward += 6
-                    print(f"Приглашение принято: от {self._history[-1]['Invite'].index(dancer_id)} к {dancer_id}")
+                    #print(f"Приглашение принято: от {self._history[-1]['Invite'].index(dancer_id)} к {dancer_id}")
                 else:
                     total_reward -= 6
-                    print(f"Приглашение отклонено: от {self._history[-1]['Invite'].index(dancer_id)} к {dancer_id}")
+                    #print(f"Приглашение отклонено: от {self._history[-1]['Invite'].index(dancer_id)} к {dancer_id}")
 
 
 

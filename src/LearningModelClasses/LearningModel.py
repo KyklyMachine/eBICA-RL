@@ -11,8 +11,6 @@ class LearningModel(ILearningModel):
         self._alpha = alpha
         self._gamma = gamma
 
-
-
     def fit(self, state: dict[str: tuple], action: dict[str: int], q_matrix, reward: float = 0):
 
         new_q = copy.deepcopy(q_matrix)
