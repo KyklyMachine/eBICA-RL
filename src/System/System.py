@@ -32,7 +32,6 @@ class DancerInit:
         return res_str
 
 
-
 class System:
 
     _states: dict[str: list[tuple]] = {}

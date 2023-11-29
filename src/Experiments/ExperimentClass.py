@@ -1,13 +1,12 @@
+import numpy as np
+
 import src.LearningModelClasses.LearningModel as lm
-import src.System.System as stm
 from src.RewardClasses import RewardN as rm
 import src.ModelClasses.Dancers as d
-from dataclasses import dataclass
-import numpy as np
-import itertools
+import src.System.System as stm
+import matplotlib.pyplot as plt
 import copy
 import os
-import matplotlib.pyplot as plt
 
 
 class Experiment:
@@ -55,43 +54,41 @@ class Experiment:
             # Rewards data
             f.write("\n3. Rewards data.\n")
             f.write("\t" + str(self._rewards) + "\n")
+
+            # Rewards statistics (mean, std, etc.)
             f.write("\n4. Rewards statistics.\n")
             less_0 = [r_i for r_i in self._rewards if r_i < 0]
             f.write("\t" + f"Less 0: {len(less_0)}" + "\n")
             greater_0 = [r_i for r_i in self._rewards if r_i >= 0]
             f.write("\t" + f"Greater or equal 0: {len(greater_0)}" + "\n")
+            f.write("\t" + f"Mean: {np.mean(self._rewards)}" + "\n")
+            f.write("\t" + f"STD: {np.std(self._rewards)}" + "\n")
 
+        # Plot reward(iteration)
         plt.plot(exp.rewards)
         plt.title(name)
         plt.xlabel("Iteration number")
         plt.ylabel("Total reward")
-        plt.legend()
         plt.savefig(f"{path}/{name}/iteration_reward")
-
-
-        """ less_0 = [r_i for r_i in self._rewards if r_i < 0]
-        greater_0 = [r_i for r_i in self._rewards if r_i >= 0]
-        print(len(less_0), len(greater_0))
-        print(np.average(self._rewards))"""
 
 
 if __name__ == "__main__":
     dancers = [
         stm.DancerInit(
             id=0,
-            dancer=d.DancerData,
-            dancer_params={"path": "../../dancer_data/data2/100.csv"},
+            dancer=d.Dancer,
+            dancer_params={},
             reward_model=rm.Reward,
-            reward_model_params={},
+            reward_model_params={"noise": True, "noise_type": "first_iterations", "noise_count": 20},
             learning_model=lm.LearningModel,
             learning_model_params={"alpha": 0.2, "gamma": 0.5}
         ),
         stm.DancerInit(
             id=1,
-            dancer=d.Dancer,
-            dancer_params={},
+            dancer=d.DancerData,
+            dancer_params={"path": "../../dancer_data/data5/500.csv"},
             reward_model=rm.Reward,
-            reward_model_params={"noise": True, "noise_type": "first_iterations", "noise_count": 20},
+            reward_model_params={},
             learning_model=lm.LearningModel,
             learning_model_params={"alpha": 0.2, "gamma": 0.5}
         ),
@@ -104,11 +101,10 @@ if __name__ == "__main__":
             learning_model=lm.LearningModel,
             learning_model_params={"alpha": 0.2, "gamma": 0.5}
         ),
-
     ]
 
     actions_dict = {"Invite": False, "Dance": True}
 
     exp = Experiment(dancers, actions_dict)
-    exp.run(5000)
-    exp.save_results("../../ExperimentsResult", "test1")
+    exp.run(3000)
+    exp.save_results("../../ExperimentsResult", "data5_dancer500-naive")

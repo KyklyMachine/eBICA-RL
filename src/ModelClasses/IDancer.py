@@ -22,7 +22,7 @@ class IDancer:
     def __str__(self):
         raise NotImplementedError()
 
-    def set_action(self, state):
+    def set_action(self, state: dict[str: tuple]):
         raise NotImplementedError()
 
     def get_action(self):

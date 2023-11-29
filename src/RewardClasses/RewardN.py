@@ -39,8 +39,6 @@ class Reward(IReward):
     Description of Reward
     """
 
-    _is_first = True
-    _is_second = True
     _is_noise: bool
     _noise_type: str
     _noise_count: int
